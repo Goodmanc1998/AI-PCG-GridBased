@@ -49,6 +49,24 @@ public class MapGenerator : MonoBehaviour
 
     int[,] newMap;
 
+    public MapCreator creator;
+
+    private static MapGenerator _instance;
+    public static MapGenerator Instance { get { return _instance; } }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -56,43 +74,21 @@ public class MapGenerator : MonoBehaviour
         GenerateMap();
     }
 
-    private void OnGUI()
+
+    public void Itteration()
     {
-        if(GUILayout.Button("Generate New Level"))
+        if (useNewMap)
         {
-            GenerateMap();
+            map = SmoothMap(map);
         }
+        else
+            SmoothMap();
 
-        if(GUILayout.Button("Smoothing Map"))
-        {
-            if (useNewMap)
-            {
-                map = SmoothMap(map);
-            }
-            else
-                SmoothMap();
-            
-        }
-
-        if(GUILayout.Button("Generate Gold"))
-        {
-            GenerateGold();
-        }
-
-        if (GUILayout.Button("Generate Start"))
-        {
-            GenerateStart();
-        }
-
-        if (GUILayout.Button("Generate Finish"))
-        {
-            GenerateFinish();
-        }
-
+        creator.CreateMap(map, mapSize);
 
     }
 
-    void GenerateMap()
+    public void GenerateMap()
     {
         //Creating the new Map size
         map = new int[(int)mapSize.x, (int)mapSize.y];
@@ -113,10 +109,15 @@ public class MapGenerator : MonoBehaviour
 
             GenerateGold();
 
-            GenerateStart();
+            //GenerateStart();
 
-            GenerateFinish();
+            //GenerateFinish();
+
+            
         }
+
+        creator.CreateMap(map, mapSize);
+
     }
 
    
@@ -207,10 +208,7 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y < mapSize.y; y++)
             {
-                int neighbourWallTiles = getSurroundingNeigbours(x, y);
-
-                //Debug.Log("X : " + x + " Y : " + y + " Count : " + neighbourWallTiles + " No : " + map[x,y] );
-                
+                int neighbourWallTiles = getSurroundingNeigbours(x, y);             
 
                 if(neighbourWallTiles >= wallsNeeded)
                 {
@@ -226,8 +224,9 @@ public class MapGenerator : MonoBehaviour
 
     
 
-    void GenerateGold()
+    public void GenerateGold()
     {
+
         for (int x = 0; x < mapSize.x; x++)
         {
             for (int y = 0; y < mapSize.y; y++)
@@ -251,6 +250,8 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
+
+        creator.CreateMap(map, mapSize);
     }
 
     
@@ -392,7 +393,8 @@ public class MapGenerator : MonoBehaviour
     }
 
 
-
+    /*
+     
 
     //Drawing Gizmos for walls and air
     private void OnDrawGizmos()
@@ -431,4 +433,6 @@ public class MapGenerator : MonoBehaviour
             }
         }
     }
+    */
+
 }
